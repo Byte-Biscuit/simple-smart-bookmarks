@@ -40,6 +40,9 @@ const NewTab: React.FC<{}> = (props) => {
     const [bookmarkList, setBookmarkList] = useState<BookmarkTreeNode[]>([])
     const [menus, setMenus] = useState([])
 
+    const [isMouseInLeftBookmarkFolder, setMouseInLeftBookmarkFolder] =
+        useState<boolean>(false)
+
     const [isSticky, setIsSticky] = useState<boolean>(false)
     const leftPartRef = useRef<HTMLDivElement>(null)
     const handleScroll = () => {
@@ -190,7 +193,13 @@ const NewTab: React.FC<{}> = (props) => {
             <ConfigProvider locale={getAntdLocale()}>
                 <div className={"flex flex-row h-screen m-0 p-0 box-border"}>
                     <div
-                        className={"w-1/6 overflow-y-auto scrollbar"}
+                        className={`w-1/6 ${isMouseInLeftBookmarkFolder ? "overflow-y-auto" : "overflow-y-hidden"}  scrollbar`}
+                        onMouseEnter={() => {
+                            setMouseInLeftBookmarkFolder(true)
+                        }}
+                        onMouseLeave={() => {
+                            setMouseInLeftBookmarkFolder(false)
+                        }}
                         ref={leftPartRef}>
                         <div
                             className={`sticky top-0 z-10 ${isSticky ? "bg-white" : "bg-transparent"} transition-colors duration-300`}>
