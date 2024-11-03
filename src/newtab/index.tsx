@@ -191,7 +191,10 @@ const NewTab: React.FC<{}> = (props) => {
                 setFrequentlyVisitedWebsiteContainerWidth
             }}>
             <ConfigProvider locale={getAntdLocale()}>
-                <div className={"flex flex-row h-screen m-0 p-0 box-border"}>
+                <div
+                    className={
+                        "flex flex-row h-screen m-0 p-0 box-border scroll-smooth"
+                    }>
                     <div
                         className={`w-1/6 ${isMouseInLeftBookmarkFolder ? "overflow-y-auto" : "overflow-y-hidden"}  scrollbar`}
                         onMouseEnter={() => {
