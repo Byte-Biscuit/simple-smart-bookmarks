@@ -50,5 +50,7 @@
     "search.engine.trick.website": "指定網站",
     "search.engine.trick.website-placeholder": "讓搜索引擎在該網站內搜索",
     "search.engine.trick.exact-match": "精確匹配",
-    "search.engine.trick.exact-match-placeholder": "請輸入精確匹配內容"
+    "search.engine.trick.exact-match-placeholder": "請輸入精確匹配內容",
+
+    "bookmark.number": "書籤數量"
 }

@@ -107,7 +107,7 @@ export const websiteInspect = async (url: string): Promise<any> => {
             console.error("No-cors fetch error:", corsErr)
         }
     }
-    if (response == null || !response.ok) {
+    if (!response?.ok) {
         // @ts-ignore
         return {
             url,
@@ -232,6 +232,8 @@ export const NewtabContext = createContext<{
     }) => void
     frequentlyVisitedWebsiteContainerWidth: number
     setFrequentlyVisitedWebsiteContainerWidth: (width: number) => void
+    bookmarkNum: number
+    setBookmarkNum: (num: number) => void
 } | null>(null)
 
 /**
@@ -239,6 +241,38 @@ export const NewtabContext = createContext<{
  */
 export const bookmarkSearch = (keyword: string) => {
     return chrome.bookmarks.search({ query: keyword })
+}
+
+/**
+ * Counting bookmarks
+ * @returns
+ */
+export const countBookmarks = (): Promise<number> => {
+    return new Promise((resolve, reject) => {
+        chrome.bookmarks.getTree((bookmarks) => {
+            if (chrome.runtime.lastError) {
+                reject(new Error(chrome.runtime.lastError.message))
+                return
+            }
+            const count = countBookmarksRecursively(bookmarks)
+            resolve(count)
+        })
+    })
+}
+
+const countBookmarksRecursively = (
+    bookmarkNodes: chrome.bookmarks.BookmarkTreeNode[]
+): number => {
+    let count = 0
+    for (const node of bookmarkNodes) {
+        if (node.url) {
+            count++
+        }
+        if (node.children) {
+            count += countBookmarksRecursively(node.children)
+        }
+    }
+    return count
 }
 
 /**
@@ -268,15 +302,11 @@ export const resetFrequentlyVisitedWebsiteLayout = async (
     _websites.sort((a, b) => {
         if (a.ranking > b.ranking) {
             return -1
-        } else if (a.ranking < b.ranking) {
-            return 1
-        } else {
-            if (a.createTime > b.createTime) {
-                return -1
-            } else {
-                return 1
-            }
         }
+        if (a.createTime > b.createTime) {
+            return -1
+        }
+        return 1
     })
     if (_websites?.length > limit) {
         return {

@@ -1,16 +1,17 @@
 import React, { useEffect, useState, useRef } from "react"
-import { Menu, Select, FloatButton, ConfigProvider } from "antd"
+import { Menu, Select, FloatButton, Button, ConfigProvider } from "antd"
 import BookmarkList from "./bookmark_list"
+import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons"
 import type {
     BookmarkListHeader,
     BookmarkTreeNode,
     FrequentlyVisitedWebsite
 } from "~util/types"
 import {
-    LocalIcon,
     Constants,
     NewtabContext,
-    getBookmarkChildren
+    getBookmarkChildren,
+    countBookmarks
 } from "~util/common"
 import { getAntdLocale, i18n } from "~locales"
 import "../tailwind.css"
@@ -18,6 +19,10 @@ import intl from "react-intl-universal"
 import logo from "data-base64:../../assets/logo.png"
 
 const DEFAULT_BOOKMARKS_SELECTED_ID = "1"
+
+// collapse button style class
+const COLLAPSE_BUTTON_CLASS =
+    "text-xl text-emerald-600 bg-emerald-100 p-2 rounded-full shadow-md border border-emerald-300 hover:bg-emerald-200 hover:text-emerald-700 transition-all duration-300 cursor-pointer"
 
 const BOOKMARKS_MAPPING = new Map<string, BookmarkTreeNode[]>()
 
@@ -38,10 +43,26 @@ const NewTab: React.FC<{}> = (props) => {
         BookmarkListHeader[]
     >([])
     const [bookmarkList, setBookmarkList] = useState<BookmarkTreeNode[]>([])
+    const [bookmarkNum, setBookmarkNum] = useState<number>(0)
     const [menus, setMenus] = useState([])
 
     const [isMouseInLeftBookmarkFolder, setMouseInLeftBookmarkFolder] =
         useState<boolean>(false)
+
+    const [isSidebarVisible, setIsSidebarVisible] = useState<boolean>(true)
+    useEffect(() => {
+        const storedState = localStorage.getItem("sidebarVisible")
+        if (storedState !== null) {
+            setIsSidebarVisible(JSON.parse(storedState))
+        }
+    }, [])
+    const toggleSidebar = () => {
+        setIsSidebarVisible((prev) => {
+            const newState = !prev
+            localStorage.setItem("sidebarVisible", JSON.stringify(newState))
+            return newState
+        })
+    }
 
     const [isSticky, setIsSticky] = useState<boolean>(false)
     const leftPartRef = useRef<HTMLDivElement>(null)
@@ -56,6 +77,11 @@ const NewTab: React.FC<{}> = (props) => {
         return () => {
             container?.removeEventListener("scroll", handleScroll)
         }
+    }, [])
+
+    // Counting bookmark
+    useEffect(() => {
+        countBookmarks().then((count) => setBookmarkNum(count))
     }, [])
 
     /**
@@ -188,60 +214,82 @@ const NewTab: React.FC<{}> = (props) => {
                 frequentlyVisitedWebsites,
                 setFrequentlyVisitedWebsites,
                 frequentlyVisitedWebsiteContainerWidth,
-                setFrequentlyVisitedWebsiteContainerWidth
+                setFrequentlyVisitedWebsiteContainerWidth,
+                bookmarkNum,
+                setBookmarkNum
             }}>
             <ConfigProvider locale={getAntdLocale()}>
                 <div
                     className={
                         "flex flex-row h-screen m-0 p-0 box-border scroll-smooth"
                     }>
-                    <div
-                        className={`w-1/6 ${isMouseInLeftBookmarkFolder ? "overflow-y-auto" : "overflow-y-hidden"}  scrollbar`}
-                        onMouseEnter={() => {
-                            setMouseInLeftBookmarkFolder(true)
-                        }}
-                        onMouseLeave={() => {
-                            setMouseInLeftBookmarkFolder(false)
-                        }}
-                        ref={leftPartRef}>
+                    {isSidebarVisible ? (
                         <div
-                            className={`sticky top-0 z-10 ${isSticky ? "bg-white" : "bg-transparent"} transition-colors duration-300`}>
-                            <Select
-                                size={"large"}
-                                defaultValue={DEFAULT_BOOKMARKS_SELECTED_ID}
-                                className={"w-full p-1"}
-                                bordered={true}
-                                onChange={async (value) => {
-                                    let menus0 = await constructMenu(
-                                        BOOKMARKS_MAPPING.get(value),
-                                        []
-                                    )
-                                    setMenus(menus0)
-                                }}
-                                options={
-                                    bookmarks != null
-                                        ? bookmarks["children"].map(
-                                              (bookmark) => {
-                                                  return {
-                                                      value: bookmark["id"],
-                                                      label: bookmark["title"]
+                            className={`w-1/6 ${isMouseInLeftBookmarkFolder ? "overflow-y-auto" : "overflow-y-hidden"}  scrollbar`}
+                            onMouseEnter={() => {
+                                setMouseInLeftBookmarkFolder(true)
+                            }}
+                            onMouseLeave={() => {
+                                setMouseInLeftBookmarkFolder(false)
+                            }}
+                            ref={leftPartRef}>
+                            <div
+                                className={`sticky top-0 z-10 ${isSticky ? "bg-white" : "bg-transparent"} transition-colors duration-300`}>
+                                <Select
+                                    size={"large"}
+                                    defaultValue={DEFAULT_BOOKMARKS_SELECTED_ID}
+                                    className={"w-full p-1"}
+                                    bordered={true}
+                                    onChange={async (value) => {
+                                        let menus0 = await constructMenu(
+                                            BOOKMARKS_MAPPING.get(value),
+                                            []
+                                        )
+                                        setMenus(menus0)
+                                    }}
+                                    options={
+                                        bookmarks != null
+                                            ? bookmarks["children"].map(
+                                                  (bookmark) => {
+                                                      return {
+                                                          value: bookmark["id"],
+                                                          label: bookmark[
+                                                              "title"
+                                                          ]
+                                                      }
                                                   }
-                                              }
-                                          )
-                                        : []
-                                }
+                                              )
+                                            : []
+                                    }
+                                />
+                            </div>
+                            <Menu
+                                className={"w-full"}
+                                mode="inline"
+                                items={menus}
+                                onClick={({ item, key, keyPath, domEvent }) => {
+                                    updateList(key, keyPath)
+                                }}
                             />
                         </div>
-                        <Menu
-                            className={"w-full"}
-                            mode="inline"
-                            items={menus}
-                            onClick={({ item, key, keyPath, domEvent }) => {
-                                updateList(key, keyPath)
-                            }}
-                        />
-                    </div>
+                    ) : (
+                        <></>
+                    )}
                     <BookmarkList />
+                </div>
+                <div
+                    className={`fixed bottom-1 left-1 z-10 bg-transparent transition-colors duration-300`}>
+                    {isSidebarVisible ? (
+                        <MenuFoldOutlined
+                            className={COLLAPSE_BUTTON_CLASS}
+                            onClick={toggleSidebar}
+                        />
+                    ) : (
+                        <MenuUnfoldOutlined
+                            className={COLLAPSE_BUTTON_CLASS}
+                            onClick={toggleSidebar}
+                        />
+                    )}
                 </div>
                 <FloatButton.Group shape="circle" style={{ right: 24 }}>
                     <FloatButton.BackTop visibilityHeight={400} />

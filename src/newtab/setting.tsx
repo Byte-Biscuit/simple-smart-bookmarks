@@ -54,6 +54,7 @@ export const Setting: React.FC<{}> = (props) => {
     const actions = (item) => {
         let actions = [
             <Button
+                key={"delete-button"}
                 className={"px-1"}
                 type="link"
                 icon={<DeleteOutlined />}
@@ -66,6 +67,7 @@ export const Setting: React.FC<{}> = (props) => {
         if (item?.default !== "1") {
             actions.push(
                 <Button
+                    key={"default-button"}
                     className={"px-1"}
                     type="link"
                     icon={<CheckCircleOutlined />}

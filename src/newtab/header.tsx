@@ -23,7 +23,8 @@ import type { FrequentlyVisitedWebsite } from "~util/types"
 import {
     PlusCircleOutlined,
     CloseCircleOutlined,
-    ClearOutlined
+    ClearOutlined,
+    UnorderedListOutlined
 } from "@ant-design/icons"
 import Search from "~newtab/search"
 import Setting from "~newtab/setting"
@@ -154,7 +155,8 @@ export const Header: React.FC<{}> = (props) => {
         frequentlyVisitedWebsites,
         setFrequentlyVisitedWebsites,
         frequentlyVisitedWebsiteContainerWidth,
-        setFrequentlyVisitedWebsiteContainerWidth
+        setFrequentlyVisitedWebsiteContainerWidth,
+        bookmarkNum
     } = useContext(NewtabContext)
     const [searchBoxVisible, setSearchBoxVisible] = useState<boolean>(false)
     const [settingVisible, setSettingVisible] = useState<boolean>(false)
@@ -255,7 +257,6 @@ export const Header: React.FC<{}> = (props) => {
                         }}>
                         {intl.get("add-website-title").d("Add website")}
                     </Button>
-
                     <Button
                         type="link"
                         icon={<LocalIcon type="icon-setting" />}
@@ -264,7 +265,6 @@ export const Header: React.FC<{}> = (props) => {
                         }}>
                         {intl.get("setting-title").d("Setting")}
                     </Button>
-
                     <Button
                         type="link"
                         icon={<ClearOutlined />}
@@ -286,6 +286,12 @@ export const Header: React.FC<{}> = (props) => {
                             })
                         }}>
                         {intl.get("clear-cache-title").d("Clear Cache")}
+                    </Button>
+                    <Button type="link" icon={<UnorderedListOutlined />}>
+                        {intl.get("bookmark.number").d("No. of bookmarks")}:
+                        <span className="text-red-600 px-1 font-medium">
+                            {bookmarkNum}
+                        </span>
                     </Button>
                 </Space>
                 <div className={"flex flex-row"}>
