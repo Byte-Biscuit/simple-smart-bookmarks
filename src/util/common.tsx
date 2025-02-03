@@ -299,9 +299,12 @@ export const resetFrequentlyVisitedWebsiteLayout = async (
         []
     let _websites = websites as FrequentlyVisitedWebsite[]
     // sorted by ranking and createTime
+    console.log(_websites)
     _websites.sort((a, b) => {
         if (a.ranking > b.ranking) {
             return -1
+        } else if (a.ranking < b.ranking) {
+            return 1
         }
         if (a.createTime > b.createTime) {
             return -1

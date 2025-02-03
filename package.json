@@ -1,7 +1,7 @@
 {
     "name": "simple-smart-bookmarks",
     "displayName": "Simple Smart Bookmarks",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "description": "Simplify and be more efficient",
     "author": "Biscuit Zhou",
     "scripts": {
