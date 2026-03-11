@@ -30,6 +30,7 @@ import Search from "~newtab/search"
 import Setting from "~newtab/setting"
 import AddWebsite from "~newtab/add_website"
 import classNames from "classnames"
+import packageJson from "../../package.json"
 
 const ELEMENT_WIDTH =
     Constants.FREQUENTLY_VISITED_WEBSITE_CONTAINER.elementWidth
@@ -294,6 +295,9 @@ export const Header: React.FC<{}> = (props) => {
                             {bookmarkNum}
                         </span>
                     </Button>
+                    <span className="text-slate-400 text-xs ml-2 select-none">
+                        v{packageJson.version}
+                    </span>
                 </Space>
                 <div className={"flex flex-row"}>
                     {frequentlyVisitedWebsites?.other?.length != 0 ? (
