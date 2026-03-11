@@ -241,10 +241,11 @@ export const Header: React.FC<{}> = (props) => {
 
             <div
                 className={
-                    "flex flex-row flex-nowrap justify-between items-center w-full"
+                    "flex flex-row flex-nowrap justify-between items-center w-full min-w-0"
                 }>
-                <Space align="center" size={16}>
-                    <span className={"text-base"}>
+                <Space align="center" size={16} className="min-w-0 flex-1">
+                    <span
+                        className={"text-base whitespace-nowrap flex-shrink-0"}>
                         {intl
                             .get("frequently-visited-website-title")
                             .d("Frequently Visited Websites")}
@@ -317,6 +318,11 @@ export const Header: React.FC<{}> = (props) => {
                     )}
                     <Input
                         rootClassName={"text-slate-400 bg-slate-100"}
+                        styles={{
+                            input: {
+                                paddingLeft: "6px"
+                            }
+                        }}
                         placeholder={intl
                             .get("search-input-placeholder")
                             .d("Try Ctrl+K for searching")}
